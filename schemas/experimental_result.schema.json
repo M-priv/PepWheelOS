@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "ExperimentalResult",
+  "type": "object",
+  "required": [
+    "result_id",
+    "candidate_id",
+    "result_type",
+    "summary",
+    "interpretation"
+  ],
+  "properties": {
+    "result_id": {
+      "type": "string"
+    },
+    "candidate_id": {
+      "type": "string"
+    },
+    "result_type": {
+      "type": "string"
+    },
+    "vendor_or_lab": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "raw_file_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "key_values": {
+      "type": "object"
+    },
+    "interpretation": {
+      "type": "string"
+    },
+    "failure_modes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_action": {
+      "type": "string"
+    }
+  }
+}

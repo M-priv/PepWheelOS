@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Hypothesis",
+  "type": "object",
+  "required": [
+    "hypothesis_id",
+    "target_id",
+    "claim",
+    "rejection_criteria"
+  ],
+  "properties": {
+    "hypothesis_id": {
+      "type": "string"
+    },
+    "target_id": {
+      "type": "string"
+    },
+    "claim": {
+      "type": "string"
+    },
+    "mechanistic_rationale": {
+      "type": "string"
+    },
+    "design_strategy": {
+      "type": "string"
+    },
+    "success_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "rejection_criteria": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "assumptions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "uncertainties": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

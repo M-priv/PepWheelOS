@@ -1,0 +1,21 @@
+project:
+  name: peptide_discovery_flywheel
+  version: 0.1.0
+
+storage:
+  mode: local_json
+  root: data
+
+agent_settings:
+  require_human_approval_for:
+    - cro_submission
+    - experimental_spend
+    - external_claim
+    - patent_decision
+    - therapeutic_claim
+
+scoring:
+  default_weights_file: config/scoring_weights.example.yaml
+
+logging:
+  audit_log_path: data/results/audit_log.jsonl

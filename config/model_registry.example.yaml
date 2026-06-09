@@ -1,0 +1,25 @@
+models:
+  target_intelligence:
+    type: llm
+    status: placeholder
+    notes: Connect to chosen LLM or literature retrieval system.
+
+  peptide_generation:
+    type: specialist_model
+    status: placeholder
+    notes: Connect to peptide or protein design model.
+
+  manufacturability_scoring:
+    type: heuristic_or_ml
+    status: v0_heuristic
+    notes: Start heuristic, later update from experimental outcomes.
+
+  structure_prediction:
+    type: specialist_model
+    status: placeholder
+    notes: Connect to structure prediction or docking workflow.
+
+  red_team:
+    type: llm
+    status: placeholder
+    notes: Critique model outputs and candidate assumptions.

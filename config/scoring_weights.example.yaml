@@ -1,0 +1,14 @@
+manufacturability_weights:
+  length_risk: 0.15
+  hydrophobicity_risk: 0.20
+  charge_risk: 0.10
+  oxidation_risk: 0.10
+  deamidation_risk: 0.10
+  cysteine_complexity_risk: 0.15
+  modification_complexity_risk: 0.10
+  purification_risk: 0.10
+
+recommendation_thresholds:
+  test_or_keep: 80
+  revise_or_test_with_caution: 60
+  revise_before_testing: 0

@@ -1,0 +1,4 @@
+source,target,edge_type
+TARGET-EXAMPLE,HYP-EXAMPLE,supports
+HYP-EXAMPLE,CAND-001,generated
+CAND-001,RESULT-SIM-001,evaluated_by

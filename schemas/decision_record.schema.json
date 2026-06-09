@@ -1,0 +1,49 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "DecisionRecord",
+  "type": "object",
+  "required": [
+    "decision_id",
+    "campaign_id",
+    "decision",
+    "rationale"
+  ],
+  "properties": {
+    "decision_id": {
+      "type": "string"
+    },
+    "campaign_id": {
+      "type": "string"
+    },
+    "related_nodes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "decision": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "alternatives_considered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approved_by": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Target",
+  "type": "object",
+  "required": [
+    "target_id",
+    "name",
+    "organism",
+    "use_case",
+    "rationale"
+  ],
+  "properties": {
+    "target_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "aliases": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "organism": {
+      "type": "string"
+    },
+    "uniprot_id": {
+      "type": "string"
+    },
+    "pdb_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "use_case": {
+      "type": "string"
+    },
+    "rationale": {
+      "type": "string"
+    },
+    "known_ligands": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "known_binding_sites": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risks": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "unknowns": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  }
+}

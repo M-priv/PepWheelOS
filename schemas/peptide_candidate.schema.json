@@ -1,0 +1,69 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "PeptideCandidate",
+  "type": "object",
+  "required": [
+    "candidate_id",
+    "sequence",
+    "target_id",
+    "hypothesis_id",
+    "modality"
+  ],
+  "properties": {
+    "candidate_id": {
+      "type": "string"
+    },
+    "sequence": {
+      "type": "string"
+    },
+    "target_id": {
+      "type": "string"
+    },
+    "hypothesis_id": {
+      "type": "string"
+    },
+    "modality": {
+      "type": "string",
+      "enum": [
+        "linear",
+        "cyclic",
+        "stapled",
+        "modified",
+        "unknown"
+      ]
+    },
+    "modifications": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "design_rationale": {
+      "type": "string"
+    },
+    "predicted_properties": {
+      "type": "object"
+    },
+    "manufacturability_score": {
+      "type": "number"
+    },
+    "risk_flags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "draft",
+        "scored",
+        "selected",
+        "ordered",
+        "tested",
+        "rejected",
+        "advanced"
+      ]
+    }
+  }
+}
