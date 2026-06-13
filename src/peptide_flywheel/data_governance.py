@@ -154,7 +154,7 @@ def _sequence_validation_errors(
     valid_residues = AMINO_STANDARD | AMINO_AMBIGUOUS
     unknown = sorted(set(sequence) - valid_residues)
     if unknown:
-        return False, "sequence contains unknown residues", [" ".join(unknown)]
+        return False, "sequence contains unknown residues", []
 
     warnings: List[str] = []
     ambiguous_residues = sorted(set(sequence) & AMINO_AMBIGUOUS)
