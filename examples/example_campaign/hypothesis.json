@@ -1,0 +1,14 @@
+{
+  "hypothesis_id": "HYP-AMP-EX-01",
+  "target_id": "TARGET-AMP-EX-01",
+  "claim": "A curated set of public antimicrobial peptides can be reprioritized via manufacturability-aware scoring to produce a smaller, safer shortlist.",
+  "design_strategy": "Reuse known AMP scaffolds, then rank by manufacturability and documented safety/solubility context before assay planning.",
+  "success_criteria": [
+    "At least 10 candidate cards are fully curated in a single campaign folder.",
+    "Each manual scoring run emits a data-governance preflight report."
+  ],
+  "rejection_criteria": [
+    "Candidates with severe sequence integrity or governance violations.",
+    "Candidates with unresolved severe assay safety concerns."
+  ]
+}

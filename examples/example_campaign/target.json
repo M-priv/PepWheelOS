@@ -1,0 +1,19 @@
+{
+  "target_id": "TARGET-AMP-EX-01",
+  "name": "Antimicrobial Peptide Discovery Sandbox Target",
+  "organism": "Gram-positive and Gram-negative bacterial panels",
+  "use_case": "Benchmark antimicrobial discovery workflows",
+  "rationale": "Validate the flywheel workflow with real, reproducible antimicrobial candidates using structured candidate scoring and governance checks.",
+  "aliases": [
+    "AMP-TARGET-001",
+    "Sandbox AMP"
+  ],
+  "risks": [
+    "Source assay conditions are not harmonized across all historical records.",
+    "Sequence-level toxicity context can be inconsistent across databases."
+  ],
+  "unknowns": [
+    "Longitudinal assay harmonization across sources.",
+    "Impact of sequence modifications not yet included in this initial candidate set."
+  ]
+}

@@ -97,7 +97,7 @@ Deliverables:
 - [x] Heuristic manufacturability scoring (`src/peptide_flywheel/scoring.py`)
 - [x] Candidate card / batch summary markdown artifacts (`src/peptide_flywheel/reporting.py`)
 - [x] JSONL/JSON persistence + validation hardening and strict/lenient modes (`src/peptide_flywheel/storage.py`, tests)
-- [ ] Manual dossier + 10-to-30 real candidate cards using templates (`examples`/`templates`)
+- [x] Manual dossier + 10-to-30 real candidate cards using templates (`examples`/`templates`)
 - [ ] CRO pack and red-team critiques
 - [ ] Simulated result ingestion + failure classification
 
