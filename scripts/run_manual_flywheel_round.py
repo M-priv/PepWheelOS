@@ -21,6 +21,16 @@ def _parse_args() -> argparse.Namespace:
     )
     parser.add_argument("--run-id", default=None, help="Unique run identifier.")
     parser.add_argument(
+        "--seed-dataset-path",
+        default=None,
+        help="Optional dataset CSV path to run governance checks before scoring candidates.",
+    )
+    parser.add_argument(
+        "--split-manifest-path",
+        default=None,
+        help="Optional split manifest JSON for the seed dataset.",
+    )
+    parser.add_argument(
         "--campaign-id",
         default="CAMP-001",
         help="Campaign namespace for generated run artifact ids.",
@@ -190,6 +200,8 @@ def main() -> None:
         candidates=candidates,
         run_id=run_id,
         campaign_id=args.campaign_id,
+        seed_dataset_path=args.seed_dataset_path,
+        split_manifest_path=args.split_manifest_path,
         output_dir=args.output_dir,
         strict=not args.skip_invalid_candidates,
         allow_ambiguous_residues=args.allow_ambiguous_residues,
@@ -207,6 +219,12 @@ def main() -> None:
         print(f"Validation warnings: {len(result.validation_warnings)}")
         for warn in result.validation_warnings:
             print(f"  - WARN: {warn}")
+    if result.data_governance_events:
+        print(f"Data governance events: {len(result.data_governance_events)}")
+        for event in result.data_governance_events:
+            print(f"  - {event}")
+    if result.data_governance_report_path:
+        print(f"Data governance report: {result.data_governance_report_path}")
     print(result.summary_markdown)
 
 

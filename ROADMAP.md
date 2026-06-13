@@ -84,7 +84,11 @@ Deliverables:
 - [x] Candidate status/state and reporting primitives
 - [x] Candidate cards and failure ontology scaffolding (templates/docs)
 - [x] DAG storage + integrity checks (`src/peptide_flywheel/dag.py`)
-- [ ] Data ingestion governance and split provenance from literature (`LIT-AMP-001`, `LIT-AMP-002`, `LIT-AMP-003`)
+- [x] Data ingestion governance and split provenance from literature (`LIT-AMP-001`, `LIT-AMP-002`, `LIT-AMP-003`)
+  - [x] Ingestion contract checks (`dataset` schema + identifier/sequence validation, duplicate IDs, required columns)
+  - [x] Split manifest provenance capture (`dataset_id`, `split_method`, `split_column`, tags, guard settings)
+  - [x] Split-aware leakage checks (exact/near-duplicate guards, truncated pairwise scan)
+  - [x] Workflow preflight integration (`seed_dataset_path` + manifest wiring + governance report output)
 
 ### Phase 1: Manual flywheel (current)
 

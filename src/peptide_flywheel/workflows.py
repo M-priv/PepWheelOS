@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 import json
@@ -19,6 +19,7 @@ from .models import (
 from .reporting import batch_summary_markdown, candidate_card_markdown
 from .scoring import heuristic_manufacturability_score
 from .storage import append_jsonl, save_json_record
+from .data_governance import run_data_governance_preflight
 
 
 AMINO_STANDARD = set("ACDEFGHIKLMNPQRSTVWY")
@@ -39,6 +40,8 @@ class ManualFlywheelRoundResult:
     summary_markdown: str
     validation_errors: List[str]
     validation_warnings: List[str]
+    data_governance_events: List[dict] = field(default_factory=list)
+    data_governance_report_path: Path | None = None
 
 
 def _validate_identifier(value: str, label: str) -> str:
@@ -80,6 +83,8 @@ def run_manual_flywheel_round(
     hypothesis: Hypothesis,
     candidates: Iterable[PeptideCandidate],
     run_id: str,
+    seed_dataset_path: str | Path | None = None,
+    split_manifest_path: str | Path | None = None,
     output_dir: str | Path,
     campaign_id: str | None = None,
     strict: bool = True,
@@ -132,6 +137,34 @@ def run_manual_flywheel_round(
     candidate_cards: List[str] = []
     validation_errors: List[str] = []
     validation_warnings: List[str] = []
+    data_governance_events: List[dict] = []
+    data_governance_report_path: Path | None = None
+    if seed_dataset_path is not None:
+        preflight = run_data_governance_preflight(
+            dataset_csv_path=seed_dataset_path,
+            split_manifest_path=split_manifest_path,
+            strict=False,
+            allow_ambiguous_residues=allow_ambiguous_residues,
+        )
+        data_governance_events = [event.to_dict() for event in preflight.events]
+        for event in preflight.events:
+            if event.severity == "error":
+                validation_errors.append(event.as_text)
+            elif event.severity == "warning":
+                validation_warnings.append(event.as_text)
+
+        data_governance_report_path = output_path / "data_governance_preflight.json"
+        data_governance_report_path.write_text(
+            json.dumps(preflight.as_dict(), indent=2),
+            encoding="utf-8",
+        )
+
+        if strict and preflight.error_count > 0:
+            raise ValueError(
+                f"Data governance preflight failed for {seed_dataset_path}: "
+                f"{preflight.error_count} error(s)."
+            )
+
     seen_candidate_ids = set[str]()
 
     for raw_candidate in candidate_list:
@@ -306,8 +339,14 @@ def run_manual_flywheel_round(
     if validation_warnings:
         report_lines.append(f"- Validation warnings: `{len(validation_warnings)}`")
         report_lines.extend(f"  - WARN: {msg}" for msg in validation_warnings)
+    if data_governance_events:
+        report_lines.append(f"- Data-governance events: `{len(data_governance_events)}`")
+        report_lines.extend(f"  - GOVERNANCE: {event.get('code')} {event.get('severity')}: {event.get('message')}" for event in data_governance_events)
+
     if not validation_errors and not validation_warnings:
         report_lines.append("- Validation: `passed`")
+    if data_governance_report_path is not None:
+        report_lines.append(f"- Data governance report: `{data_governance_report_path}`")
 
     report_lines.extend(["", "## Batch summary", summary, "", "## Candidate cards"])
     for card in candidate_cards:
@@ -328,4 +367,6 @@ def run_manual_flywheel_round(
         summary_markdown=summary,
         validation_errors=validation_errors,
         validation_warnings=validation_warnings,
+        data_governance_events=data_governance_events,
+        data_governance_report_path=data_governance_report_path,
     )
