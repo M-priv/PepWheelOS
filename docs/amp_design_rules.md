@@ -42,6 +42,13 @@
 5. `linear_or_cyclic` should be `linear` or `cyclic`.
 6. `gram_status` should be one of `Gram-positive`, `Gram-negative`, `Gram+/Gram-`, `Fungal`, or `Unknown`.
 
+## Literature-backed data rules
+
+1. Baseline dataset and splitting standards should follow `PepBenchmark` conventions: consistent cleaning, standardized preprocessing, and recorded split recipes (`LIT-AMP-001`).
+2. Apply similarity-aware validation at least for toxicity/haemolysis tasks (`LIT-AMP-003`).
+3. Treat activity labels as a controlled ontology, not raw text labels (`LIT-AMP-002`).
+4. Maintain an explicit uncertainty marker where source context is ambiguous (`LIT-AMP-021`).
+
 ## Manufacturability-focused curation gates
 
 1. Flag and deprioritise sequences with:
@@ -52,6 +59,15 @@
 2. Prefer low `asparagine_glutamine_count` for long campaigns unless rapid synthesis control is available.
 3. Capture formulation context directly in `known_stability_notes` and `known_solubility_notes`.
 4. Include explicit clinical or assay failure context in `notes` to support manufacturability-aware scoring.
+5. Add explicit synthetic feasibility notes for cyclic candidates before synthesis handoff (`LIT-AMP-012`).
+
+## Multi-objective candidate pre-filter
+
+Use hard+soft gates with explicit rationale:
+
+1. Hard safety gate: minimum hemolysis/haemolysis-confidence and toxicity constraints (`LIT-AMP-004`, `LIT-AMP-007`, `LIT-AMP-008`).
+2. Hard manufacturability gate: cyclic complexity, extreme residue composition, and assay-support gaps (`LIT-AMP-010`, `LIT-AMP-012`).
+3. Soft ranking gate: Pareto-aware scoring using activity/novelty/toxicity (`LIT-AMP-005`, `LIT-AMP-006`, `LIT-AMP-015`).
 
 ## `amp_liability_examples.csv`
 
@@ -78,3 +94,4 @@ Required columns:
 3. Run `scripts/validate_amp_dataset.py --seed data/processed/amp_seed_dataset.csv --liability data/processed/amp_liability_examples.csv`.
 4. Run `scripts/calculate_amp_features.py` to normalize computed features.
 5. Generate cards with `scripts/generate_candidate_cards_from_csv.py`.
+6. Record run metadata (code version, model IDs, split spec) in `literature/search_log.md` or experiment notes.

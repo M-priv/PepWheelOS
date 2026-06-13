@@ -47,3 +47,10 @@
 | `metric` | string | yes | Quantified liability value/range. |
 | `reference` | string | yes | Source reference key or URL. |
 | `notes` | string | no | Short interpretation statement for scoring.
+
+## Literature-linked implementation notes
+
+- Keep raw fields (`mic_unit`, `reference`, `notes`) as low-friction provenance anchors for leakage and ontology checks (`LIT-AMP-001`, `LIT-AMP-002`).
+- Add `validation_split_tag` or equivalent provenance column in downstream transforms to capture similarity-aware or homology-aware split strategy (`LIT-AMP-003`, `LIT-AMP-018`).
+- For cyclic candidates, explicitly model `cyclisation_mode` and `ring_strategy` in feature pipelines before manufacturability scoring (`LIT-AMP-012`).
+- Record uncertainty when fields are inferred from abstracts only or non-standard assays (`LIT-AMP-009` marked as uncertain).

@@ -51,6 +51,7 @@ Outputs:
 - Candidate list
 - Rationale per candidate
 - Required downstream scoring
+- Multi-objective tradeoff rationale (`LIT-AMP-005`, `LIT-AMP-006`, `LIT-AMP-007`, `LIT-AMP-015`)
 
 ## Manufacturability Agent
 
@@ -65,6 +66,8 @@ Outputs:
 - Modification complexity
 - Stability liabilities
 - Overall manufacturability score
+- Hard-stop reasons
+- Suggested mitigations (`LIT-AMP-004`, `LIT-AMP-007`, `LIT-AMP-012`)
 
 ## Red-Team Agent
 
@@ -77,6 +80,7 @@ Outputs:
 - Model overconfidence risks
 - Alternative explanations
 - Minimum evidence needed to proceed
+- Failure bucket assignments (`LIT-AMP-021`, `LIT-AMP-018`)
 
 ## Assay Planning Agent
 
@@ -90,6 +94,7 @@ Outputs:
 - Acceptance criteria
 - Rejection criteria
 - Priority order
+- Homology-aware split plan for local re-evals (`LIT-AMP-003`, `LIT-AMP-021`)
 
 ## Learning Agent
 
@@ -101,3 +106,25 @@ Outputs:
 - Failure mode assignment
 - Revised design heuristics
 - Next-round recommendation
+
+## Binder Agent
+
+Purpose:
+Route and design binder-specific peptide candidates.
+
+Outputs:
+- Target-site candidate list
+- Complex-aware sequence/structure suggestions
+- Cyclisation feasibility notes
+- Confidence score and failure-mode rationale (`LIT-AMP-010`, `LIT-AMP-011`, `LIT-AMP-012`, `LIT-AMP-013`, `LIT-AMP-014`)
+
+## MCP Orchestration Agent
+
+Purpose:
+Coordinate tool calls, retries, and provenance capture.
+
+Outputs:
+- Planned tool graph and retry policy
+- State snapshots
+- Confidence-aware completion status
+- Failed action retries and evidence trails (`LIT-AMP-014`, `LIT-AMP-019`)

@@ -67,3 +67,11 @@ Use this taxonomy to classify every failed candidate. Negative data is a core as
 - STRUCTURE_PREDICTION_ARTEFACT
 - DATA_LEAKAGE
 - INSUFFICIENT_CONTROLS
+- AGENT_ORCHESTRATION_FAILURE
+- MISSING_REPRODUCIBILITY_CONTEXT
+
+## Evidence-linked additions
+
+- `DATA_LEAKAGE` and `INSUFFICIENT_CONTROLS` become explicit labels for anti-leakage review (`LIT-AMP-001`, `LIT-AMP-002`, `LIT-AMP-003`, `LIT-AMP-018`).
+- `MODEL_OVERCONFIDENCE` requires contradiction logs and red-team evidence (`LIT-AMP-021`).
+- `AGENT_ORCHESTRATION_FAILURE` and `MISSING_REPRODUCIBILITY_CONTEXT` should be logged from agent workflows (`LIT-AMP-014`, `LIT-AMP-015`, `LIT-AMP-019`).
