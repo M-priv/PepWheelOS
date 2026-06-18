@@ -1,22 +1,30 @@
 # Simulated Experimental Result
 
-Result ID: RESULT-SIM-001
-Candidate ID: CAND-001
+Result ID: RESULT-SIM-003
+Candidate ID: AMP_SRC_DBAASP_763
 Campaign ID: CAMPAIGN-EXAMPLE
 Result type: Simulated assay result
 
 ## Summary
 
-Placeholder result used to test the failure-analysis workflow.
+Potency was present but modest in only one experimental condition.
+
+## Key values
+
+| Metric | Value | Notes |
+|---|---:|---|
+| MIC50 (uM) | 32 | Modest response |
+| Solubility (mg/mL) | 0.4 | Low aqueous solubility |
+| Purity (%) | 89.0 | Crude quality issue |
 
 ## Interpretation
 
-Populate after simulation or real data ingestion.
+Some wells showed precipitation and elevated noise in readout.
 
 ## Failure modes
 
-To be populated.
+No failure modes were manually tagged.
 
 ## Next design recommendation
 
-To be populated.
+Retest with a modified formulation before deciding on redesign.

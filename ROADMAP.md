@@ -1,6 +1,6 @@
 # Roadmap
 
-**Current slice: Phase 1 (Manual flywheel)**
+**Current slice: Phase 2 (Semi-automated agents)**
 
 ## Phase 0: Scaffold and domain setup
 
@@ -98,14 +98,26 @@ Deliverables:
 - [x] Candidate card / batch summary markdown artifacts (`src/peptide_flywheel/reporting.py`)
 - [x] JSONL/JSON persistence + validation hardening and strict/lenient modes (`src/peptide_flywheel/storage.py`, tests)
 - [x] Manual dossier + 10-to-30 real candidate cards using templates (`examples`/`templates`)
-- [ ] CRO pack and red-team critiques
-- [ ] Simulated result ingestion + failure classification
+- [x] CRO pack and red-team critiques
+  - [x] Added CRO packs for high-priority seed candidates.
+  - [x] Added red-team critique files for same candidates.
+- [x] Simulated result ingestion + failure classification
+  - [x] Added markdown and JSON result parser with validation and raw-file capture.
+  - [x] Added heuristic failure-mode classifier aligned to ontology.
+  - [x] Added simulated result ingestion script and example campaign outputs.
+  - [x] Added result-to-candidate review step (`scripts/run_result_review.py`) to apply status transitions and persist decision records.
+  - [x] Added campaign-DAG merge in review loop when `--base-dag-json` is provided.
+  - [x] Added campaign close-loop outputs:
+    - `closed_loop_recommendations.json`
+    - `campaign_recommendation_plan.json`
+    - `next_round_plan.json`
+    - `campaign_decision.json`.
 
 ### Phase 2: Semi-automated agents
 
-- [ ] CLI/JSON schema validation hooks
-- [ ] Structured prompt pipelines for target dossier, candidate cards, red-team, assay pack
-- [ ] Batch import/export and report generator
+- [x] CLI/JSON schema validation hooks
+- [x] Structured prompt pipelines for target dossier, candidate cards, red-team, assay pack
+- [x] Batch import/export and report generator
 - [ ] Active-learning simulator + prompt-driven scoring summaries
 - [ ] Agent contract hardening and retry policy (`LIT-AMP-014`, `LIT-AMP-019`, `LIT-AMP-021`)
 
