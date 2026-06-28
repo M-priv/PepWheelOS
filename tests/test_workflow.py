@@ -53,7 +53,7 @@ def test_manual_flywheel_round_strict_mode_rejects_invalid_sequence(tmp_path):
     target, hypothesis = _base_objects()
     bad_candidate = PeptideCandidate(
         candidate_id="CAND-002",
-        sequence="ACZZZ",
+        sequence="AC***",
         target_id="TARGET-001",
         hypothesis_id="HYP-001",
     )

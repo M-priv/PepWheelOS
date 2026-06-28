@@ -2,21 +2,24 @@
 
 ## Immediate
 
-- [ ] Populate one target dossier manually.
-- [ ] Create 10 candidate cards.
-- [ ] Run heuristic manufacturability scoring.
-- [ ] Write red-team critiques for top 3 candidates.
-- [ ] Create one CRO request pack.
-- [ ] Add simulated result and classify failure.
+- [x] Populate one target dossier manually.
+- [x] Create 10 candidate cards.
+- [x] Run heuristic manufacturability scoring.
+- [x] Write red-team critiques for top candidates.
+- [x] Create CRO request packs.
+- [x] Add simulated result and classify failure.
 
 ## Next
 
-- [ ] Add command-line interface.
-- [ ] Add JSON validation.
+- [x] Add command-line interface.
+- [x] Add JSON validation.
 - [ ] Add DAG visualisation.
-- [ ] Add candidate batch import/export.
-- [ ] Add report generator.
-- [ ] Add simple active-learning simulator.
+- [x] Add candidate batch import/export.
+- [x] Add report generator.
+- [x] Add simple active-learning simulator.
+- [x] Harden agent contracts and retry policy.
+- [ ] Add DAG visualisation.
+- [ ] Add sequence/property tool layer.
 
 ## Later
 

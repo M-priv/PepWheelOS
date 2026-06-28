@@ -23,12 +23,13 @@ The defensible asset is not the first model. The defensible asset is the cumulat
 - Assay and CRO/CDMO pack templates
 - Data schemas
 - Python stubs for future implementation
-- Roadmap and project backlog
+- Active-learning simulation artifacts for next-batch prioritisation
+- Planning docs: [roadmap](docs/planning/roadmap.md), [project map](docs/planning/project_map.md), [Codex plugin spec](docs/planning/codex_plugin_spec.md), and [project backlog](backlog/project_backlog.md)
 - Documentation for IP, quality, validation and portfolio development
 
-## Suggested first build
+## Suggested build path
 
-Start with:
+The scaffold now supports the first end-to-end loop:
 
 1. Target dossier agent
 2. Peptide candidate card system

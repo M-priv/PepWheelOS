@@ -118,8 +118,15 @@ Deliverables:
 - [x] CLI/JSON schema validation hooks
 - [x] Structured prompt pipelines for target dossier, candidate cards, red-team, assay pack
 - [x] Batch import/export and report generator
-- [ ] Active-learning simulator + prompt-driven scoring summaries
-- [ ] Agent contract hardening and retry policy (`LIT-AMP-014`, `LIT-AMP-019`, `LIT-AMP-021`)
+- [x] Active-learning simulator + prompt-driven scoring summaries
+  - [x] Added deterministic next-batch ranking over candidate records.
+  - [x] Added prompt packet for scoring-summary review.
+  - [x] Added CLI, markdown report, JSON plan/rankings and DAG output.
+- [x] Agent contract hardening and retry policy (`LIT-AMP-014`, `LIT-AMP-019`, `LIT-AMP-021`)
+  - [x] Added prompt-packet contract validation for agent JSON outputs.
+  - [x] Added context ID checks against source packet inputs.
+  - [x] Added deterministic retry packet generation for repairable failures.
+  - [x] Added CLI and tests for contract evaluation.
 
 ### Phase 3: Scientific tooling integration
 

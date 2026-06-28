@@ -12,6 +12,14 @@ Every agent must:
 6. Identify what would falsify its output.
 7. Avoid making unverified clinical or experimental claims.
 
+Agent outputs should be checked through the contract validator before they are accepted into a campaign. A valid agent handoff has:
+- a source prompt packet
+- a JSON-only response
+- schema-valid output for the requested artifact
+- identifiers that match the source target, hypothesis, candidate, campaign and run context
+- warnings for missing uncertainty, risk, evidence or control fields
+- a retry packet when repairable failures are found
+
 ## Target Intelligence Agent
 
 Purpose:
@@ -128,3 +136,10 @@ Outputs:
 - State snapshots
 - Confidence-aware completion status
 - Failed action retries and evidence trails (`LIT-AMP-014`, `LIT-AMP-019`)
+
+Minimum retry policy:
+- Parse and validate every agent response before accepting it.
+- Retry only repairable contract failures such as invalid JSON, schema errors or identifier mismatch.
+- Stop after the configured maximum attempts and require human review.
+- Preserve the original prompt packet, failed output, validation report and retry packet as artifacts.
+- Do not treat a successful retry as scientific evidence; it only proves contract compliance.
