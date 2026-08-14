@@ -128,24 +128,39 @@ Deliverables:
   - [x] Added deterministic retry packet generation for repairable failures.
   - [x] Added CLI and tests for contract evaluation.
 
-### Phase 3: Scientific tooling integration
+### Phase 3: Scientific Tooling, Epistemic Rigor & SRE Runtime
 
-- [ ] Sequence/property tool layer (structure embeddings, descriptors) from generated candidates
-- [ ] Pluggable predictor layer: hemolysis/toxicity/regression style outputs (`LIT-AMP-004`, `LIT-AMP-007`, `LIT-AMP-008`)
-- [ ] Multi-objective ranking templates with Pareto/hypervolume policy (`LIT-AMP-005`, `LIT-AMP-006`, `LIT-AMP-015`)
-- [ ] Binder/cyclic route feasibility checks (`LIT-AMP-010`, `LIT-AMP-011`, `LIT-AMP-012`)
-- [ ] DAG visibility: richer agent graph outputs and tool-call provenance
+- [ ] **Pillar 1: 4-Tier Epistemic Firewall & Domain DRC**
+  - [ ] Assume-Guarantee contract decorators (`src/peptide_flywheel/contracts.py`)
+  - [ ] Biological Design Rule Checking (DRC) engine for hard chemical/synthesis invariants (`src/peptide_flywheel/domain_drc.py`)
+  - [ ] Adversarial Dialectical Committee (Advocate vs. Sceptic Agent) with Rule Arbiter (`src/peptide_flywheel/dialectic.py`)
+  - [ ] Dissensus-driven active learning routing for engine disagreement (`LIT-AMP-021`)
+- [ ] **Pillar 4: SRE Agent Runtime & Content-Addressed Storage**
+  - [ ] Content-Addressed Storage (`cas://<sha256>`) and JSON Patch delta encoder (`src/peptide_flywheel/cas_store.py`)
+  - [ ] 3-Tier Prefix-Invariant KV-cache compliant prompt architecture (`src/peptide_flywheel/prompt_pipeline.py`)
+  - [ ] Localized AST subtree repair and deterministic context injection (`src/peptide_flywheel/ast_repair.py`)
+  - [ ] 3-State SRE circuit breaker, concurrency bulkheads, and Dead-Letter Queue (`src/peptide_flywheel/circuit_breaker.py`)
+- [ ] **Pillars 3 & 5A: Multi-Objective Pareto Sorting & Conformal Prediction**
+  - [ ] NSGA-II non-dominated sorting and hypervolume diversity clustering (`src/peptide_flywheel/pareto_sort.py`)
+  - [ ] Split Conformal Prediction intervals ($90\%$ coverage bounds) for property surrogates (`src/peptide_flywheel/conformal.py`)
 
-### Phase 4: Experimental feedback loop
+### Phase 4: Experimental Feedback, Negative Data & Asynchronous Loop
 
-- [ ] Vendor/CDMO report parser and normalized assay result schema
-- [ ] Failure mode mapping loop against existing ontology (`docs/04_failure_ontology.md`)
-- [ ] Closed-loop recommendations from assay outcomes
-- [ ] Uncertainty calibration / contradiction logging (`LIT-AMP-021`)
+- [ ] **Pillar 2: Asynchronous Pipelining & Multi-Fidelity Batch BO**
+  - [ ] Determinantal Point Process (DPP) $L$-ensemble sequence diversity repulsion sampler (`src/peptide_flywheel/dpp_sampler.py`)
+  - [ ] Asynchronous Bayesian Optimization with Monte Carlo fantasy rollouts over $X_{\text{pending}}$ (`src/peptide_flywheel/async_bo.py`)
+  - [ ] Multi-stage staggered telemetry ingestion (Day 10 Crude LCMS -> Day 18 QC -> Day 30 Bioassays) (`src/peptide_flywheel/result_ingestion.py`)
+- [ ] **Pillar 3: Decoupled Negative Data Learning & Causal Attribution**
+  - [ ] Decoupled Hurdle GP Feasibility Classifier ($P(\text{Feasible} \mid x) \times f_{\text{potency}}(x \mid \text{Feasible})$) (`src/peptide_flywheel/hurdle_models.py`)
+  - [ ] Tobit right-censored likelihood engine for assay detection floor/ceiling limits (`src/peptide_flywheel/tobit_gp.py`)
+  - [ ] Causal motif failure deconstruction mapped to `04_failure_ontology.md` (`src/peptide_flywheel/causal_attribution.py`)
+  - [ ] Retroactive Invariant Sweeper for historical DAG re-evaluation (`src/peptide_flywheel/ontology_sweeper.py`)
 
-### Phase 5: Portfolio and venture demo
+### Phase 5: Portfolio & Apple HIG Scientist Triage Workbench
 
-- [ ] Full reproducible campaign using one safe target
-- [ ] Portfolio-style decision record + technical story deck
-- [ ] Public-facing architecture + governance summary
-- [ ] Dashboard-style campaign explorer
+- [ ] **Pillar 5B: Review-by-Exception & Apple HIG Triage UI**
+  - [ ] Review-by-Exception tri-state automated gating engine (Auto-Green 70%, Auto-Red 15%, Amber Triage 15%) (`src/peptide_flywheel/triage_engine.py`)
+  - [ ] Apple HIG-inspired glassmorphic scientist triage interface (`src/peptide_flywheel/ui/`) with 3-level progressive disclosure (Orbit -> Radar -> Forensic AST Drawer)
+  - [ ] Keyboard-first power triage (`J/K` navigate, `A` advance, `R` reject with ontology code `1-4`, `Space` forensic drawer) (`scripts/run_triage_workbench.py`)
+  - [ ] Full reproducible 3-round asynchronous campaign demo with investor/technical report
+

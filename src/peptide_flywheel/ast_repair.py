@@ -1,0 +1,122 @@
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+from typing import Any, Dict, List, Optional, Tuple
+from pydantic import ValidationError
+
+
+@dataclass
+class ASTRepairResult:
+    repaired_payload: Dict[str, Any]
+    deterministic_repairs_applied: List[str]
+    isolated_invalid_fields: List[str]
+    requires_llm_micro_repair: bool
+
+
+def deterministic_ast_normalization(
+    raw_payload: Dict[str, Any],
+    expected_context: Optional[Dict[str, Any]] = None,
+) -> Tuple[Dict[str, Any], List[str]]:
+    """Apply zero-LLM deterministic normalization to raw JSON payloads.
+    
+    Fixes:
+    - Context ID injection / alignment
+    - Sequence whitespace stripping & IUPAC uppercasing
+    - Numeric string-to-float coercion
+    - Score bounding / clamping
+    - Empty list / dict defaults
+    """
+    import copy
+    payload = copy.deepcopy(raw_payload)
+    repairs_applied: List[str] = []
+
+    # 1. Inject or enforce expected context IDs
+    if expected_context:
+        for id_key in ("target_id", "hypothesis_id", "candidate_id", "campaign_id", "run_id"):
+            expected_val = expected_context.get(id_key)
+            if expected_val and payload.get(id_key) != expected_val:
+                payload[id_key] = expected_val
+                repairs_applied.append(f"Injected/aligned context field '{id_key}' = '{expected_val}'")
+
+    # 2. Normalize sequence string
+    if "sequence" in payload and isinstance(payload["sequence"], str):
+        clean_seq = payload["sequence"].strip().upper()
+        if clean_seq != payload["sequence"]:
+            payload["sequence"] = clean_seq
+            repairs_applied.append("Normalized sequence (stripped whitespace and uppercased)")
+
+    # 3. Numeric string coercion and clamping for scores
+    score_fields = (
+        "manufacturability_score",
+        "overall_score",
+        "affinity_score",
+        "liability_score",
+        "confidence",
+    )
+    for field_name in score_fields:
+        if field_name in payload and payload[field_name] is not None:
+            val = payload[field_name]
+            if isinstance(val, str):
+                try:
+                    val = float(val.strip())
+                    payload[field_name] = val
+                    repairs_applied.append(f"Coerced '{field_name}' from string '{payload[field_name]}' to float {val}")
+                except ValueError:
+                    pass
+
+            # If score is a float, check bounds
+            if isinstance(payload[field_name], (int, float)):
+                orig_val = float(payload[field_name])
+                # Check whether score is on 0-1 or 0-100 scale
+                if field_name == "manufacturability_score" or field_name == "overall_score":
+                    if orig_val > 1.0 and orig_val <= 100.0:
+                        # Normalize 0-100 to 0-1 if standard schema expects float <= 1.0
+                        pass
+                if orig_val < 0.0:
+                    payload[field_name] = 0.0
+                    repairs_applied.append(f"Clamped negative '{field_name}' {orig_val} to 0.0")
+
+    # 4. Normalize list fields
+    list_fields = ("risk_flags", "evidence_required", "failure_hypotheses", "acceptance_criteria", "rejection_criteria", "controls")
+    for lf in list_fields:
+        if lf in payload:
+            if isinstance(payload[lf], str):
+                # If LLM passed comma-separated string instead of list
+                items = [item.strip() for item in payload[lf].split(",") if item.strip()]
+                payload[lf] = items
+                repairs_applied.append(f"Coerced comma-delimited string '{lf}' into list of {len(items)} items")
+            elif not isinstance(payload[lf], list):
+                payload[lf] = []
+
+    return payload, repairs_applied
+
+
+def isolate_invalid_ast_subfields(validation_error: ValidationError) -> List[str]:
+    """Extract path locators of invalid subfields from Pydantic ValidationError."""
+    failed_paths = []
+    for err in validation_error.errors():
+        loc_parts = [str(p) for p in err.get("loc", ())]
+        field_path = ".".join(loc_parts)
+        if field_path:
+            failed_paths.append(field_path)
+    return list(dict.fromkeys(failed_paths))
+
+
+def repair_candidate_card_ast(
+    raw_payload: Dict[str, Any],
+    expected_context: Optional[Dict[str, Any]] = None,
+    validation_error: Optional[ValidationError] = None,
+) -> ASTRepairResult:
+    """Master AST repair engine combining deterministic normalization and subtree error isolation."""
+    normalized_payload, repairs = deterministic_ast_normalization(raw_payload, expected_context)
+    
+    invalid_fields: List[str] = []
+    if validation_error:
+        invalid_fields = isolate_invalid_ast_subfields(validation_error)
+
+    return ASTRepairResult(
+        repaired_payload=normalized_payload,
+        deterministic_repairs_applied=repairs,
+        isolated_invalid_fields=invalid_fields,
+        requires_llm_micro_repair=len(invalid_fields) > 0,
+    )

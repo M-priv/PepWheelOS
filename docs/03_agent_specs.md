@@ -126,20 +126,40 @@ Outputs:
 - Cyclisation feasibility notes
 - Confidence score and failure-mode rationale (`LIT-AMP-010`, `LIT-AMP-011`, `LIT-AMP-012`, `LIT-AMP-013`, `LIT-AMP-014`)
 
-## MCP Orchestration Agent
+## Adversarial Dialectic Committee (Advocate vs. Sceptic Agent)
 
 Purpose:
-Coordinate tool calls, retries, and provenance capture.
+Eliminate shared cognitive blind spots and sycophantic convergence via dialectical falsification.
+
+### Advocate Agent
+- **Utility Function:** Build the strongest structural and biological affinity case for candidate.
+- **Outputs:** Proposed binding mechanism, interface contacts, target fit rationale, predicted affinity.
+
+### Sceptic / Red-Team Agent
+- **Utility Function:** Formulate explicit falsification hypotheses and identify failure modes.
+- **Outputs:** Structural clash liabilities, SPPS aggregation risks, assay artifact risks, unaddressed unknowns, hard-stop recommendations.
+
+### Rule & SMT Arbiter
+- **Utility Function:** Adjudicate between Advocate and Sceptic using physical invariants (Domain DRC) and empirical historical benchmarks.
+- **Outputs:** Adjudication score, dissensus metric ($\Delta_{\text{dissensus}}$), routing recommendation (`SYNTHESIS_PIPELINE`, `ACTIVE_LEARNING_DISCRIMINATIVE_ASSAY`, or `REJECT_WITH_FAILURE_MEMORY`).
+
+## Tri-State Triage Gating Agent
+
+Purpose:
+Execute automated review-by-exception to protect human scientists from review fatigue.
 
 Outputs:
-- Planned tool graph and retry policy
-- State snapshots
-- Confidence-aware completion status
-- Failed action retries and evidence trails (`LIT-AMP-014`, `LIT-AMP-019`)
+- Gating classification:
+  - `AUTO_GREEN`: High potency, zero risk flags, high conformal confidence $\to$ auto-queued for synthesis with audit log.
+  - `AUTO_RED`: Hard-stop chemical/synthesis liabilities $\to$ auto-rejected with ontology attribution.
+  - `AMBER_TRIAGE`: High-uncertainty, high-novelty, or conflicting Pareto trade-offs $\to$ routed to Apple HIG triage workbench.
+- Multi-objective Pareto rank and hypervolume contribution score.
+- Conformal prediction intervals ($90\%$ coverage bounds).
 
-Minimum retry policy:
+## Minimum retry policy:
 - Parse and validate every agent response before accepting it.
 - Retry only repairable contract failures such as invalid JSON, schema errors or identifier mismatch.
 - Stop after the configured maximum attempts and require human review.
 - Preserve the original prompt packet, failed output, validation report and retry packet as artifacts.
 - Do not treat a successful retry as scientific evidence; it only proves contract compliance.
+

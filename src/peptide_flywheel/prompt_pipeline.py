@@ -56,6 +56,18 @@ class AssayPackOutput(BaseModel):
 
 
 @dataclass
+class PromptTieredLayout:
+    """3-Tier KV-cache compliant layout separating invariant prefixes from dynamic tails."""
+    tier1_static_system_prefix: str    # Invariant persona, output schema & ontology (Permanently Cached)
+    tier2_campaign_context: str        # Target dossier & standard controls (Cached per Campaign)
+    tier3_dynamic_tail: str            # Candidate sequence & specific task instruction (Dynamic)
+
+    def render(self) -> str:
+        """Combine all 3 tiers in strict prefix order."""
+        return f"{self.tier1_static_system_prefix}\n\n{self.tier2_campaign_context}\n\n{self.tier3_dynamic_tail}".strip()
+
+
+@dataclass
 class PromptPacket:
     packet_id: str
     agent: str
@@ -63,7 +75,48 @@ class PromptPacket:
     instruction: str
     input_payload: dict[str, Any]
     output_schema: dict[str, Any]
+    context_envelope_ref: str | None = None
     created_at: str = datetime.now(tz=timezone.utc).isoformat()
+
+    def get_tiered_layout(self) -> PromptTieredLayout:
+        """Render prompt text structured for optimal KV prefix caching."""
+        tier1 = (
+            f"=== SYSTEM ROLE: {self.agent.upper()} ===\n"
+            f"Artifact Target: {self.artifact}\n"
+            f"Output Contract: Respond ONLY with a valid JSON object strictly conforming to this schema:\n"
+            f"{self.output_schema}"
+        )
+        
+        campaign_info = {
+            "campaign_id": self.input_payload.get("campaign_id", "default"),
+            "target": self.input_payload.get("target"),
+            "hypothesis": self.input_payload.get("hypothesis"),
+        }
+        tier2 = (
+            f"=== CAMPAIGN CONTEXT ===\n"
+            f"Campaign Data:\n{campaign_info}"
+        )
+        
+        dynamic_info = {
+            "packet_id": self.packet_id,
+            "run_id": self.input_payload.get("run_id"),
+            "candidate": self.input_payload.get("candidate"),
+            "instruction": self.instruction,
+        }
+        tier3 = (
+            f"=== TASK INSTRUCTION & CANDIDATE ===\n"
+            f"Instruction: {self.instruction}\n"
+            f"Candidate Data:\n{dynamic_info}"
+        )
+        return PromptTieredLayout(
+            tier1_static_system_prefix=tier1,
+            tier2_campaign_context=tier2,
+            tier3_dynamic_tail=tier3,
+        )
+
+    def render_prompt_text(self) -> str:
+        """Render full prefix-cached prompt string."""
+        return self.get_tiered_layout().render()
 
     def model_dump(self) -> dict[str, Any]:
         return {
@@ -73,6 +126,7 @@ class PromptPacket:
             "instruction": self.instruction,
             "input_payload": self.input_payload,
             "output_schema": self.output_schema,
+            "context_envelope_ref": self.context_envelope_ref,
             "created_at": self.created_at,
         }
 
@@ -85,6 +139,7 @@ def _build_packet(
     instruction: str,
     input_payload: dict[str, Any],
     output_model: type[BaseModel],
+    context_envelope_ref: str | None = None,
 ) -> PromptPacket:
     return PromptPacket(
         packet_id=packet_id,
@@ -93,7 +148,9 @@ def _build_packet(
         instruction=instruction,
         input_payload=input_payload,
         output_schema=output_model.model_json_schema(),
+        context_envelope_ref=context_envelope_ref,
     )
+
 
 
 def build_target_dossier_prompt(

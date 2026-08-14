@@ -15,6 +15,7 @@ from peptide_flywheel.agent_contracts import (
     evaluate_agent_output,
     load_prompt_packet,
 )
+from peptide_flywheel.ast_repair import deterministic_ast_normalization
 
 
 def _parse_args() -> argparse.Namespace:
@@ -25,6 +26,11 @@ def _parse_args() -> argparse.Namespace:
     parser.add_argument("--output", required=True, help="Agent output JSON file.")
     parser.add_argument("--attempt", type=int, default=1, help="Attempt number for retry policy.")
     parser.add_argument("--max-attempts", type=int, default=3, help="Maximum retry attempts.")
+    parser.add_argument(
+        "--no-auto-repair",
+        action="store_true",
+        help="Disable automatic deterministic AST normalization before evaluation.",
+    )
     parser.add_argument(
         "--report",
         default=None,
@@ -41,7 +47,21 @@ def _parse_args() -> argparse.Namespace:
 def main() -> None:
     args = _parse_args()
     packet = load_prompt_packet(args.packet)
-    raw_output = Path(args.output).read_text(encoding="utf-8")
+    raw_text = Path(args.output).read_text(encoding="utf-8")
+
+    # Apply deterministic AST repair if enabled and valid JSON
+    raw_output = raw_text
+    repairs_log = []
+    if not args.no_auto_repair:
+        try:
+            parsed_json = json.loads(raw_text)
+            if isinstance(parsed_json, dict):
+                expected_ctx = packet.input_payload
+                normalized_doc, repairs_log = deterministic_ast_normalization(parsed_json, expected_ctx)
+                raw_output = json.dumps(normalized_doc)
+        except Exception:
+            pass  # Fall through to standard contract evaluation error reporting
+
     evaluation = evaluate_agent_output(
         packet=packet,
         raw_output=raw_output,
@@ -49,6 +69,8 @@ def main() -> None:
         retry_policy=AgentRetryPolicy(max_attempts=args.max_attempts),
     )
     payload = evaluation.to_dict()
+    payload["deterministic_repairs"] = repairs_log
+
 
     if args.report:
         Path(args.report).write_text(json.dumps(payload, indent=2), encoding="utf-8")

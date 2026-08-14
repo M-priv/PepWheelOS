@@ -18,8 +18,10 @@ from .models import (
 )
 from .reporting import batch_summary_markdown, candidate_card_markdown
 from .scoring import heuristic_manufacturability_score
+from .domain_drc import run_biological_drc_suite
 from .storage import append_jsonl, save_json_record
 from .data_governance import run_data_governance_preflight
+
 
 
 AMINO_STANDARD = set("ACDEFGHIKLMNPQRSTVWY")
@@ -242,37 +244,52 @@ def run_manual_flywheel_round(
             continue
 
         score = heuristic_manufacturability_score(candidate.sequence, candidate.modality.value)
+        drc_summary = run_biological_drc_suite(candidate.sequence, candidate.modality.value)
+
+        # Merge heuristic risk flags and DRC rule violations
+        combined_risk_flags = list(score.risk_flags)
+        for v in drc_summary.violations:
+            flag = f"DRC_{v.failure_code}"
+            if flag not in combined_risk_flags:
+                combined_risk_flags.append(flag)
 
         candidate.manufacturability_score = score.overall_score
-        candidate.risk_flags = score.risk_flags
-        candidate.predicted_properties = score.dimension_scores
+        candidate.risk_flags = combined_risk_flags
+        candidate.predicted_properties = {
+            **score.dimension_scores,
+            "drc_net_charge_ph74": drc_summary.net_charge_ph74,
+            "drc_gravy_index": drc_summary.gravy_index,
+            "drc_passed_hard_drc": 1.0 if drc_summary.passed_hard_drc else 0.0,
+        }
         if candidate.status == CandidateStatus.DRAFT:
             candidate.status = CandidateStatus.SCORED
 
         prediction_run = PredictionRun(
             prediction_id=f"{campaign_id}-{run_id}-{candidate.candidate_id}-pred",
             candidate_id=candidate.candidate_id,
-            tool_name="heuristic_manufacturability_score",
-            tool_version="0.1.0",
+            tool_name="heuristic_manufacturability_score_with_drc",
+            tool_version="0.2.0",
             input_refs=[run_id, candidate.candidate_id],
             outputs={
                 "overall_score": score.overall_score,
-                "risk_flags": score.risk_flags,
-                "dimension_scores": score.dimension_scores,
+                "risk_flags": combined_risk_flags,
+                "dimension_scores": candidate.predicted_properties,
+                "hard_stop_reasons": drc_summary.hard_stop_reasons,
             },
             interpretation=score.recommendation,
-            uncertainty="heuristic",
+            uncertainty="heuristic_drc",
         )
 
         assessment = ManufacturabilityAssessment(
             assessment_id=f"{campaign_id}-{run_id}-{candidate.candidate_id}-manu",
             candidate_id=candidate.candidate_id,
-            dimension_scores=score.dimension_scores,
+            dimension_scores=candidate.predicted_properties,
             overall_score=score.overall_score,
-            risk_flags=score.risk_flags,
-            mitigation_notes=[],
-            recommendation=score.recommendation,
+            risk_flags=combined_risk_flags,
+            mitigation_notes=drc_summary.suggested_remediations,
+            recommendation=score.recommendation if drc_summary.passed_hard_drc else "reject_or_redesign_drc_failure",
         )
+
 
         dag.add_node(candidate.candidate_id, "peptide_candidate", candidate.model_dump(mode="json"))
         dag.add_node(

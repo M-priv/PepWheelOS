@@ -76,3 +76,8 @@ prompt-history/
 prompt-history/*
 prompt.txt
 agent_run_*.md
+
+# Flywheel Runtime CAS / DLQ storage
+.flywheel_cas/
+.flywheel_dlq/
+
