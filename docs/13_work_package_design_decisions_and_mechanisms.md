@@ -214,3 +214,37 @@ When real wet-lab CSV/JSON data arrives:
 2. **Fantasy Dissolution:** The $M=32$ fantasy worlds are automatically deleted and collapse into the single, true empirical reality.
 3. **Review-by-Exception:** Human scientists only intervene if an SRE anomaly is detected (e.g. assay noise $\sigma_n^2$ spikes $>3\times$ due to plate contamination or 0% batch synthesis yield).
 
+---
+
+### 6.6 Deep Dive: Cholesky Numerical Stability & The Eigenvalue Shift Theorem
+
+#### 1. The Core Failure Mode: Why Clustered or Identical Candidates Fail
+When sampling correlated fantasy draws ($\tilde{\mathbf{y}} = \boldsymbol{\mu} + \mathbf{L}\boldsymbol{\epsilon}$), the algorithm computes the Cholesky factorisation $\mathbf{\Sigma} = \mathbf{L}\mathbf{L}^T$.  
+If the candidate pool contains two identical (or heavily clustered) peptides ($x_1 \approx x_2$), their correlation is $K(x_1, x_2) = 1.0$:
+$$\mathbf{\Sigma} = \begin{bmatrix} 1.0 & 1.0 \\ 1.0 & 1.0 \end{bmatrix}$$
+* **Determinant:** $\det(\mathbf{\Sigma}) = (1.0 \times 1.0) - (1.0 \times 1.0) = \mathbf{0.0}$.
+* **Eigenvalues:** $\lambda_1 = 2.0$, $\lambda_2 = \mathbf{0.0}$.
+
+Cholesky decomposition strictly requires all eigenvalues to be strictly positive ($\lambda_i > 0$). When an eigenvalue is zero or slightly negative (due to 64-bit float rounding), LAPACK crashes with `LinAlgError: Matrix is not positive definite`.
+
+#### 2. The Mathematical Proof: The Eigenvalue Shift Theorem
+When we add diagonal jitter $\epsilon \mathbf{I}$ (where $\epsilon = 10^{-6}$ and $\mathbf{I}$ is the Identity matrix):
+$$\mathbf{\Sigma}_{\text{stable}} = \mathbf{\Sigma} + \epsilon \mathbf{I}$$
+
+If $\mathbf{v}$ is an eigenvector of $\mathbf{\Sigma}$ with eigenvalue $\lambda$:
+$$\mathbf{\Sigma}_{\text{stable}}\mathbf{v} = (\mathbf{\Sigma} + \epsilon \mathbf{I})\mathbf{v} = \mathbf{\Sigma}\mathbf{v} + \epsilon \mathbf{v} = \lambda \mathbf{v} + \epsilon \mathbf{v} = \mathbf{(\lambda + \epsilon)} \mathbf{v}$$
+
+**Theorem Outcome:** Adding $\epsilon \mathbf{I}$ shifts every single eigenvalue upwards by exactly $+\epsilon$:
+$$\lambda_i^{\text{new}} = \lambda_i + \epsilon$$
+
+Even for 100% duplicate candidates where $\lambda_{\min} = 0.0$:
+$$\lambda_{\min}^{\text{new}} = 0.0 + 10^{-6} = \mathbf{10^{-6} > 0}$$
+
+Because all eigenvalues are mathematically guaranteed to be strictly positive ($\lambda_i > 0$), the matrix $\mathbf{\Sigma}_{\text{stable}}$ is **100% guaranteed to be strictly positive definite and invertible**, ensuring Cholesky sampling never crashes regardless of candidate similarity.
+
+#### 3. Why It Does Not Distort Biophysical Correlations
+* $\epsilon = 10^{-6}$ is **one part in a million** ($0.0001\%$).
+* Off-diagonal cross-correlations ($K_{12} = 0.950000$) remain completely untouched.
+* Physically, $\epsilon = 10^{-6}$ represents an infinitesimal instrument noise floor, which accurately reflects real-world laboratory assays where zero-noise measurements do not physically exist.
+
+
