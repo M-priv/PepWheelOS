@@ -50,3 +50,30 @@ def test_repair_candidate_card_ast_master():
     assert result.repaired_payload["sequence"] == "ACDE"
     assert result.repaired_payload["manufacturability_score"] == 0.92
     assert result.requires_llm_micro_repair is False
+
+
+def test_ast_repair_clamping_and_hallucination_warning():
+    raw_payload = {
+        "candidate_id": "CAND-001",
+        "sequence": "KWK",
+        "confidence": "85.0",           # 85% percentage -> should auto-normalise to 0.85
+        "overall_score": 105.0,          # >100 -> should clamp ceiling to 100.0
+        "affinity_score": -500.0,        # Extreme negative hallucination -> clamp to 0.0 & warn
+    }
+
+    normalized, repairs = deterministic_ast_normalization(raw_payload)
+
+    # 1. Verify percentage auto-normalisation
+    assert normalized["confidence"] == 0.85
+
+    # 2. Verify ceiling clamping
+    assert normalized["overall_score"] == 100.0
+
+    # 3. Verify floor clamping
+    assert normalized["affinity_score"] == 0.0
+
+    # 4. Verify explicit hallucination warning was logged
+    warning_logs = [r for r in repairs if "WARNING" in r and "Extreme out-of-bounds" in r]
+    assert len(warning_logs) == 1
+    assert "-500.0" in warning_logs[0]
+

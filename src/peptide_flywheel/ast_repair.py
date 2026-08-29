@@ -67,14 +67,23 @@ def deterministic_ast_normalization(
             # If score is a float, check bounds
             if isinstance(payload[field_name], (int, float)):
                 orig_val = float(payload[field_name])
-                # Check whether score is on 0-1 or 0-100 scale
-                if field_name == "manufacturability_score" or field_name == "overall_score":
-                    if orig_val > 1.0 and orig_val <= 100.0:
-                        # Normalize 0-100 to 0-1 if standard schema expects float <= 1.0
-                        pass
+                
+                # Flag extreme hallucinations (e.g. |score| > 150)
+                if orig_val < -10.0 or orig_val > 150.0:
+                    repairs_applied.append(f"WARNING: Extreme out-of-bounds value {orig_val} detected on '{field_name}' (potential hallucination)")
+
+                # Clamp negative floor
                 if orig_val < 0.0:
                     payload[field_name] = 0.0
                     repairs_applied.append(f"Clamped negative '{field_name}' {orig_val} to 0.0")
+                elif field_name in ("confidence", "affinity_score") and orig_val > 1.0 and orig_val <= 100.0:
+                    # Normalise 0-100 percentage to 0.0-1.0 probability
+                    payload[field_name] = orig_val / 100.0
+                    repairs_applied.append(f"Normalised percentage '{field_name}' {orig_val} to {payload[field_name]}")
+                elif orig_val > 100.0:
+                    payload[field_name] = 100.0
+                    repairs_applied.append(f"Clamped ceiling on '{field_name}' {orig_val} to 100.0")
+
 
     # 4. Normalize list fields
     list_fields = ("risk_flags", "evidence_required", "failure_hypotheses", "acceptance_criteria", "rejection_criteria", "controls")
