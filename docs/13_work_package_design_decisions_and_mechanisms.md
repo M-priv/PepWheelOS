@@ -31,3 +31,7 @@ This index provides direct links to the dedicated, deep-dive architectural and m
 
 * 📄 [**`phase_4_wp_2_async_bayesian_optimisation_and_fantasy_rollouts.md`**](file:///Users/michaeladesiyan/Projects/peptide_discovery_flywheel_scaffold/docs/work_packages/phase_4_wp_2_async_bayesian_optimisation_and_fantasy_rollouts.md)  
   *Pillar 2B:* The Physical Latency Mismatch, Mathematical Variance Independence Proof, Monte Carlo Fantasy Sampling ($M=32$), The 4 Physical Anchors, Automated MML Parameter Calibration, and Cholesky Numerical Stability (Eigenvalue Shift Theorem).
+
+* 📄 [**`phase_4_wp_3_staggered_telemetry_ingestion.md`**](file:///Users/michaeladesiyan/Projects/peptide_discovery_flywheel_scaffold/docs/work_packages/phase_4_wp_3_staggered_telemetry_ingestion.md)  
+  *Pillar 2C:* Three-Wave Staggered Telemetry Ingestion Timeline (Day 10 Crude LCMS $\to$ Day 18 Purified QC/DLS $\to$ Day 30 Bioassay SPR Kinetics), Monoisotopic Mass Accuracy Verification ($|M_{\text{obs}} - M_{\text{exp}}| \le 1.0\text{ Da}$), Tolerant CSV/JSON Parsers, and Lifecycle State Machine Transitions.
+
