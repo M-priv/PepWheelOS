@@ -35,3 +35,11 @@ This index provides direct links to the dedicated, deep-dive architectural and m
 * 📄 [**`phase_4_wp_3_staggered_telemetry_ingestion.md`**](file:///Users/michaeladesiyan/Projects/peptide_discovery_flywheel_scaffold/docs/work_packages/phase_4_wp_3_staggered_telemetry_ingestion.md)  
   *Pillar 2C:* Three-Wave Staggered Telemetry Ingestion Timeline (Day 10 Crude LCMS $\to$ Day 18 Purified QC/DLS $\to$ Day 30 Bioassay SPR Kinetics), Monoisotopic Mass Accuracy Verification ($|M_{\text{obs}} - M_{\text{exp}}| \le 1.0\text{ Da}$), Tolerant CSV/JSON Parsers, and Lifecycle State Machine Transitions.
 
+---
+
+## Technical & Experimental Calibration Registries
+
+* 📄 [**`14_telemetry_and_pipeline_assumptions_registry.md`**](file:///Users/michaeladesiyan/Projects/peptide_discovery_flywheel_scaffold/docs/14_telemetry_and_pipeline_assumptions_registry.md)  
+  *Calibration Registry:* Systematic tracking of mass spectrometry tolerances (monoisotopic vs. average MW for $N > 30$), crude-to-purified conversion rates, formulation cosolvent benchmarks ($1\%$ DMSO), 1:1 Langmuir SPR kinetic fit residual analysis, and cross-batch reference control normalisation (`LIT-AMP-001`).
+
+
