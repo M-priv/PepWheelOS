@@ -1,6 +1,5 @@
-from __future__ import annotations
-
-from dataclasses import dataclass, field
+import copy
+from dataclasses import dataclass
 from typing import Any, Dict, List, Optional, Tuple
 from pydantic import ValidationError
 
@@ -26,7 +25,6 @@ def deterministic_ast_normalization(
     - Score bounding / clamping
     - Empty list / dict defaults
     """
-    import copy
     payload = copy.deepcopy(raw_payload)
     repairs_applied: List[str] = []
 
@@ -76,7 +74,7 @@ def deterministic_ast_normalization(
                 if orig_val < 0.0:
                     payload[field_name] = 0.0
                     repairs_applied.append(f"Clamped negative '{field_name}' {orig_val} to 0.0")
-                elif field_name in ("confidence", "affinity_score") and orig_val > 1.0 and orig_val <= 100.0:
+                elif field_name in ("confidence", "affinity_score") and 1.0 < orig_val <= 100.0:
                     # Normalise 0-100 percentage to 0.0-1.0 probability
                     payload[field_name] = orig_val / 100.0
                     repairs_applied.append(f"Normalised percentage '{field_name}' {orig_val} to {payload[field_name]}")
@@ -102,13 +100,8 @@ def deterministic_ast_normalization(
 
 def isolate_invalid_ast_subfields(validation_error: ValidationError) -> List[str]:
     """Extract path locators of invalid subfields from Pydantic ValidationError."""
-    failed_paths = []
-    for err in validation_error.errors():
-        loc_parts = [str(p) for p in err.get("loc", ())]
-        field_path = ".".join(loc_parts)
-        if field_path:
-            failed_paths.append(field_path)
-    return list(dict.fromkeys(failed_paths))
+    return list(dict.fromkeys(".".join(map(str, err.get("loc", ()))) for err in validation_error.errors() if err.get("loc")))
+
 
 
 def repair_candidate_card_ast(

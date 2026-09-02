@@ -1,7 +1,3 @@
-from __future__ import annotations
-
-import pytest
-
 from peptide_flywheel.async_bo import CandidateExperimentState
 from peptide_flywheel.telemetry_ingestion import (
     BioassayTelemetry,
@@ -13,6 +9,7 @@ from peptide_flywheel.telemetry_ingestion import (
     parse_telemetry_json,
     process_telemetry_drop,
 )
+
 
 
 def test_crude_lcms_mass_matching_and_thresholds():

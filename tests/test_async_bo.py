@@ -1,15 +1,12 @@
-from __future__ import annotations
-
 import numpy as np
-import pytest
 
 from peptide_flywheel.async_bo import (
-    CandidateExperimentState,
     GaussianProcessSurrogate,
     compute_async_acquisition,
     propose_async_batch,
     sample_fantasy_outcomes,
 )
+
 
 
 def test_gp_surrogate_interpolation_and_variance():

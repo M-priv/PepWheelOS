@@ -1,14 +1,14 @@
-from dataclasses import dataclass
 from enum import Enum
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import numpy as np
+from scipy.stats import norm
 
 from .dpp_sampler import (
     DPPBatchResult,
+    compute_average_pairwise_distance,
     generate_sequence_features,
     greedy_dpp_map_selection,
 )
-
 
 
 class CandidateExperimentState(str, Enum):
@@ -18,13 +18,6 @@ class CandidateExperimentState(str, Enum):
     MEASURED = "measured"                      # Physical assay completed and validated
     FAILED = "failed"                          # Physical synthesis or assay drop-out
 
-
-@dataclass
-class AsyncBOState:
-    measured_candidate_ids: List[str]
-    in_flight_candidate_ids: List[str]
-    proposed_candidate_ids: List[str]
-    n_fantasies: int = 32
 
 
 class GaussianProcessSurrogate:
@@ -150,7 +143,6 @@ def _expected_improvement(
     xi: float = 0.01,
 ) -> np.ndarray:
     """Compute Expected Improvement (EI) acquisition values."""
-    from scipy.stats import norm
     sigma = np.sqrt(np.maximum(1e-10, var))
     improvement = mu - best_y - xi
     z = improvement / sigma
@@ -211,11 +203,11 @@ def compute_async_acquisition(
     
     # 2. Evaluate acquisition across all M fantasy worlds
     all_acquisitions = np.zeros((n_fantasies, len(X_candidates)), dtype=np.float64)
+    # Hoist constant feature matrix stacking outside the loop
+    X_aug = np.vstack([X_historical, X_pending])
 
     for m in range(n_fantasies):
         y_fantasy = fantasies[m]
-        # Augment historical data with this fantasy world: D_aug = D_hist ∪ {X_pending, y_fantasy}
-        X_aug = np.vstack([X_historical, X_pending])
         y_aug = np.concatenate([y_historical, y_fantasy])
         
         virtual_gp = GaussianProcessSurrogate()
@@ -232,6 +224,7 @@ def compute_async_acquisition(
     # 3. Asynchronous Acquisition = Monte Carlo mean across all fantasy worlds
     alpha_async = np.mean(all_acquisitions, axis=0)
     return alpha_async
+
 
 
 def propose_async_batch(
@@ -294,8 +287,6 @@ def propose_async_batch(
         cand_ids = [candidate_pool[i].get("candidate_id", f"CAND-{i:03d}") for i in sorted_indices]
         seqs = [pool_seqs[i] for i in sorted_indices]
         scores = [float(alpha_async[i]) for i in sorted_indices]
-        
-        from .dpp_sampler import compute_average_pairwise_distance
         avg_dist = compute_average_pairwise_distance(X_pool, sorted_indices)
         
         return DPPBatchResult(
@@ -305,3 +296,4 @@ def propose_async_batch(
             quality_scores=scores,
             average_pairwise_distance=avg_dist,
         )
+

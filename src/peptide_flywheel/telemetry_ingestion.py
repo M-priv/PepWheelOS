@@ -1,13 +1,14 @@
-from __future__ import annotations
-
+import copy
 import csv
 import io
 import json
+import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, List, Optional, Sequence, Tuple
 
 from .async_bo import CandidateExperimentState
+
 
 
 class TelemetryStage(str, Enum):
@@ -152,8 +153,8 @@ def parse_telemetry_json(json_content: str) -> List[Dict[str, Any]]:
     raw_data = json.loads(json_content)
     if isinstance(raw_data, dict):
         raw_list = raw_data.get("records", raw_data.get("candidates", [raw_data]))
-    elif isinstance(raw_list := raw_data, list):
-        pass
+    elif isinstance(raw_data, list):
+        raw_list = raw_data
     else:
         raw_list = []
 
@@ -174,7 +175,6 @@ def ingest_candidate_telemetry(
     stage: TelemetryStage,
 ) -> Tuple[Dict[str, Any], List[str]]:
     """Ingest experimental telemetry into a single candidate card and advance lifecycle state."""
-    import copy
     card = copy.deepcopy(candidate_card)
     logs: List[str] = []
     cid = card.get("candidate_id", "UNKNOWN")
@@ -217,7 +217,6 @@ def ingest_candidate_telemetry(
             card["experiment_state"] = CandidateExperimentState.FAILED.value
             card["status"] = "rejected"
             card["risk_flags"].extend(s1_obj.failure_codes)
-            card["risk_flags"] = list(dict.fromkeys(card["risk_flags"]))
             logs.append(f"[{cid}] Stage 1 Crude LCMS Failed: {', '.join(s1_obj.failure_codes)}")
 
     # 2. Stage 2: Purified QC & DLS
@@ -250,7 +249,6 @@ def ingest_candidate_telemetry(
             card["experiment_state"] = CandidateExperimentState.FAILED.value
             card["status"] = "rejected"
             card["risk_flags"].extend(s2_obj.failure_codes)
-            card["risk_flags"] = list(dict.fromkeys(card["risk_flags"]))
             logs.append(f"[{cid}] Stage 2 Purified QC Failed: {', '.join(s2_obj.failure_codes)}")
 
     # 3. Stage 3: Bioassays & SPR
@@ -289,7 +287,6 @@ def ingest_candidate_telemetry(
 
         if s3_obj.is_binder and s3_obj.kd_nm is not None:
             # Update measured potency score (e.g. pKd scale: -log10(Kd * 1e-9))
-            import math
             pkd = -math.log10(max(1e-12, s3_obj.kd_nm * 1e-9))
             card["potency"] = round(pkd * 10.0, 2)  # Normalized potency score
             card["status"] = "evaluated"
@@ -298,10 +295,12 @@ def ingest_candidate_telemetry(
             card["status"] = "rejected"
             card["potency"] = 0.0
             card["risk_flags"].extend(s3_obj.failure_codes)
-            card["risk_flags"] = list(dict.fromkeys(card["risk_flags"]))
             logs.append(f"[{cid}] Stage 3 Bioassay Non-Binder: {', '.join(s3_obj.failure_codes)}")
 
+    # Deduplicate risk flags cleanly once
+    card["risk_flags"] = list(dict.fromkeys(card["risk_flags"]))
     return card, logs
+
 
 
 def process_telemetry_drop(
